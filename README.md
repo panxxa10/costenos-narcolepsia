@@ -5,7 +5,7 @@ Sistema en Go (solo librería estándar) que lleva el control de pacientes coste
 
 ## Integrantes
 
-- [MI NOMBRE]
+- Miguel Quintero
 
 ## Requisitos
 
