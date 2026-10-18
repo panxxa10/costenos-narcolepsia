@@ -3,114 +3,339 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Hospital de los Costeños con Narcolepsia</title>
+<title>La Dormilona · Hospital de los Costeños con Narcolepsia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Bungee+Shade&family=Chivo:wght@400;700;900&family=Chivo+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
+  /* Paleta de chiva y carnaval: amarillo de la carrocería, rojo de picó,
+     azul Caribe, verde guacamaya, crudo de caña flecha y negro vueltiao. */
   :root {
-    --mar: #0b7a8f;
-    --arena: #fff4dc;
-    --sol: #f7b32b;
-    --coral: #f25f5c;
-    --palma: #2a9d5c;
-    --tinta: #23313a;
+    --amarillo: #ffc72c;
+    --rojo: #e4252c;
+    --azul: #0057b8;
+    --verde: #00a651;
+    --crudo: #f6e7c8;
+    --negro: #1b1712;
+    --madera: #8a4b22;
+    --display: "Bungee", "Arial Black", Impact, sans-serif;
+    --shade: "Bungee Shade", "Bungee", "Arial Black", Impact, sans-serif;
+    --body: "Chivo", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+    --mono: "Chivo Mono", ui-monospace, Menlo, Consolas, monospace;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
-    background: var(--arena);
-    color: var(--tinta);
+    font-family: var(--body);
+    color: var(--negro);
+    background: var(--azul);
   }
-  header {
-    background: linear-gradient(90deg, var(--mar), #13a3b8);
-    color: white;
-    padding: 1rem 1.5rem;
+  :focus-visible { outline: 3px solid var(--amarillo); outline-offset: 2px; }
+
+  /* Franjas de chiva: rojo, amarillo, azul, verde */
+  .franjas {
+    height: 28px;
+    background: repeating-linear-gradient(to bottom,
+      var(--rojo) 0 7px, var(--amarillo) 7px 14px,
+      var(--crudo) 14px 21px, var(--verde) 21px 28px);
   }
-  header h1 { margin: 0; font-size: 1.5rem; }
-  header p { margin: .25rem 0 0; opacity: .9; }
+
+  /* Trenza de sombrero vueltiao */
+  .vueltiao {
+    background:
+      linear-gradient(135deg, var(--negro) 25%, transparent 25%) -10px 0 / 20px 20px,
+      linear-gradient(225deg, var(--negro) 25%, transparent 25%) -10px 0 / 20px 20px,
+      linear-gradient(315deg, var(--negro) 25%, transparent 25%) 0 0 / 20px 20px,
+      linear-gradient(45deg, var(--negro) 25%, transparent 25%) 0 0 / 20px 20px,
+      var(--crudo);
+  }
+
+  /* ---------- Letrero de la chiva ---------- */
+  .frente {
+    background: var(--amarillo);
+    padding: 1.5rem 1rem 1.25rem;
+    text-align: center;
+    border-bottom: 6px solid var(--negro);
+  }
+  .placa {
+    display: inline-block;
+    max-width: 100%;
+    background: var(--crudo);
+    border: 5px solid var(--rojo);
+    border-radius: 18px;
+    box-shadow: 0 0 0 5px var(--crudo), 0 0 0 10px var(--azul);
+    padding: .8rem 1.5rem 1rem;
+    margin: .75rem 0;
+  }
+  .placa .empresa {
+    font-family: var(--display);
+    font-size: clamp(.7rem, 2.2vw, .95rem);
+    letter-spacing: .12em;
+    color: var(--azul);
+  }
+  .placa h1 {
+    font-family: var(--shade);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 9vw, 5.2rem);
+    line-height: 1;
+    margin: .2rem 0;
+    color: var(--rojo);
+  }
+  .placa .ruta {
+    font-family: var(--mono);
+    font-size: clamp(.7rem, 2vw, .85rem);
+    margin: .3rem 0 0;
+  }
+  .lema {
+    font-weight: 700;
+    margin: .5rem auto 0;
+    max-width: 40rem;
+  }
+
+  /* ---------- Carrocería ---------- */
   main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 3rem;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1rem;
-    padding: 1rem 1.5rem;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 1.25rem;
   }
-  section {
-    background: white;
+  @media (max-width: 860px) { main { grid-template-columns: minmax(0, 1fr); } }
+  .ancho { grid-column: 1 / -1; }
+
+  .tabla {
+    background: var(--crudo);
+    border: 4px solid var(--negro);
+    border-radius: 14px;
+    padding: 1.1rem 1.1rem 1.3rem;
+    box-shadow: 6px 6px 0 var(--negro);
+  }
+  h2 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 1.15rem;
+    margin: 0 0 .9rem;
+    display: flex;
+    align-items: baseline;
+    gap: .5rem;
+    flex-wrap: wrap;
+  }
+  h2 small {
+    font-family: var(--body);
+    font-size: .8rem;
+    font-weight: 400;
+  }
+
+  /* Ventanas de la chiva = salas */
+  .ventanas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 1rem;
+    background: var(--madera);
     border-radius: 10px;
     padding: 1rem;
-    box-shadow: 0 2px 6px rgba(0,0,0,.08);
   }
-  h2 { margin-top: 0; font-size: 1.1rem; color: var(--mar); }
-  .rooms { display: flex; flex-wrap: wrap; gap: .75rem; }
-  .room {
-    flex: 1 1 90px;
-    border-radius: 8px;
-    padding: .75rem;
+  .ventana {
+    border-radius: 60px 60px 8px 8px;
+    border: 5px solid var(--amarillo);
+    padding: 1.1rem .6rem .8rem;
     text-align: center;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: .2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .ventana.disponible { background: #bfe6ff; }
+  .ventana.ocupada { background: var(--azul); color: white; }
+  .ventana .num { font-family: var(--display); font-size: 1.8rem; line-height: 1; }
+  .ventana .estado { font-family: var(--mono); font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; }
+  .ventana .quien { font-weight: 700; font-size: .9rem; }
+
+  /* Zzz que suben en las ventanas ocupadas */
+  .zzz {
+    position: absolute;
+    top: .6rem;
+    right: 1rem;
+    font-family: var(--display);
+    color: var(--amarillo);
+    animation: sube 2.4s ease-in infinite;
+  }
+  @keyframes sube {
+    from { transform: translateY(12px); opacity: 0; }
+    40% { opacity: 1; }
+    to { transform: translateY(-14px); opacity: 0; }
+  }
+
+  /* Afiche de picó = alerta de pasillo */
+  .pico {
+    padding: 12px;
+    border-radius: 14px;
+    box-shadow: 6px 6px 0 var(--negro);
+  }
+  .pico-dentro {
+    background: var(--negro);
+    color: var(--crudo);
+    border-radius: 6px;
+    padding: 1.1rem;
+    height: 100%;
+  }
+  .pico h2 { color: var(--amarillo); }
+  .pico .cuenta {
+    font-family: var(--shade);
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--rojo);
+  }
+  .pico .cuenta.cero { color: var(--verde); }
+  .pico ul { list-style: none; padding: 0; margin: .8rem 0 0; }
+  .pico li { padding: .5rem 0; border-top: 2px dashed #4a4036; }
+  .pico li b { color: var(--amarillo); }
+
+  /* Pasajeros */
+  .lugar label { font-weight: 700; display: block; margin-bottom: .3rem; }
+  .lugar input {
+    width: 100%;
+    font: inherit;
+    padding: .6rem .7rem;
+    border: 3px solid var(--negro);
+    border-radius: 8px;
+    background: white;
+  }
+  #msg { min-height: 1.5rem; margin: .7rem 0; font-weight: 700; }
+  #msg.warn { color: var(--rojo); }
+  #msg.ok { color: var(--verde); }
+
+  .pasajeros {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: .9rem;
+  }
+  .boleto {
+    background: white;
+    border: 3px solid var(--negro);
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .boleto .franja {
+    padding: .35rem .7rem;
+    font-family: var(--mono);
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    display: flex;
+    justify-content: space-between;
     color: white;
   }
-  .room.disponible { background: var(--palma); }
-  .room.ocupada { background: var(--coral); }
-  .room b { font-size: 1.3rem; display: block; }
-  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
-  th, td { text-align: left; padding: .4rem; border-bottom: 1px solid #eee; }
-  .badge { padding: .15rem .5rem; border-radius: 999px; font-size: .8rem; color: white; white-space: nowrap; }
-  .s0 { background: var(--palma); }
-  .s1 { background: var(--coral); }
-  .s2 { background: var(--mar); }
-  button {
-    border: 0; border-radius: 6px; padding: .3rem .6rem;
-    cursor: pointer; font-size: .8rem; margin: .1rem;
+  .e0 .franja { background: var(--verde); }
+  .e1 .franja { background: var(--rojo); }
+  .e2 .franja { background: var(--azul); }
+  .boleto .cuerpo { padding: .7rem; flex: 1; }
+  .boleto .nombre { font-weight: 900; font-size: 1.05rem; }
+  .boleto .dato { font-size: .85rem; margin-top: .2rem; }
+  .boleto button {
+    margin: 0 .7rem .7rem;
+    font-family: var(--display);
+    font-size: .85rem;
+    padding: .55rem;
+    border: 3px solid var(--negro);
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--negro);
   }
-  .sleep { background: var(--sol); }
-  .wake { background: #d7eef2; }
-  input { padding: .4rem; width: 100%; border: 1px solid #ccc; border-radius: 6px; }
-  ul { padding-left: 1.2rem; margin: 0; }
-  li { margin-bottom: .3rem; font-size: .85rem; }
-  #msg { min-height: 1.4rem; margin: .5rem 0 0; font-weight: 600; }
-  .warn { color: var(--coral); }
-  .ok { color: var(--palma); }
-  .wide { grid-column: 1 / -1; }
+  .boleto button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--negro); }
+  .dormir { background: var(--amarillo); }
+  .despertar { background: var(--crudo); }
+
+  /* Tripulación y reporte */
+  .lista { list-style: none; padding: 0; margin: 0; }
+  .lista li {
+    display: flex;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .55rem 0;
+    border-bottom: 2px dotted var(--madera);
+  }
+  .lista li:last-child { border-bottom: 0; }
+  .rol { font-family: var(--mono); font-size: .75rem; text-transform: uppercase; color: var(--madera); }
+  .cifra { font-family: var(--display); font-size: 1.2rem; color: var(--rojo); white-space: nowrap; }
+
+  /* Bitácora */
+  .bitacora { list-style: none; padding: 0; margin: 0; font-family: var(--mono); font-size: .8rem; }
+  .bitacora li { padding: .5rem 0; border-bottom: 1px solid #d8c69f; overflow-wrap: anywhere; }
+
+  footer {
+    text-align: center;
+    color: var(--crudo);
+    font-size: .8rem;
+    padding: 0 1rem 2rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .zzz { animation: none; }
+  }
 </style>
 </head>
 <body>
-<header>
-  <h1>🌴 Hospital de los Costeños con Narcolepsia</h1>
-  <p>Aquí nadie se queda dormido en el pasillo... bueno, casi nadie. ¡Ajá!</p>
+<div class="franjas"></div>
+<header class="frente">
+  <div class="placa">
+    <div class="empresa">Hospital de los Costeños con Narcolepsia</div>
+    <h1>La Dormilona</h1>
+    <p class="ruta">Ruta: Cafetería · Radiología · Pasillo 2º piso · Urgencias</p>
+  </div>
+  <p class="lema">Aquí el que se duerme no se queda en el pasillo: se le busca cama, ¡ajá!</p>
 </header>
+<div class="franjas"></div>
+
 <main>
-  <section>
-    <h2>🛏️ Salas</h2>
-    <div class="rooms" id="rooms"></div>
+  <section class="tabla" aria-labelledby="t-salas">
+    <h2 id="t-salas">Salas <small>cada ventana es una cama</small></h2>
+    <div class="ventanas" id="rooms"></div>
   </section>
 
-  <section>
-    <h2>🚨 Dormidos en el pasillo</h2>
-    <ul id="hallway"></ul>
-    <h2 style="margin-top:1rem">😴 Reporte de severos (hoy)</h2>
-    <ul id="severe"></ul>
+  <section class="pico vueltiao" aria-labelledby="t-pasillo">
+    <div class="pico-dentro">
+      <h2 id="t-pasillo">Dormidos en el pasillo</h2>
+      <div class="cuenta" id="hallway-count">0</div>
+      <ul id="hallway"></ul>
+    </div>
   </section>
 
-  <section>
-    <h2>👩‍⚕️ Personal (turnos round-robin)</h2>
-    <ul id="staff"></ul>
+  <section class="tabla ancho" aria-labelledby="t-pacientes">
+    <h2 id="t-pacientes">Pacientes</h2>
+    <div class="lugar">
+      <label for="loc">¿Dónde le dio el sueño?</label>
+      <input id="loc" value="la fila del almuerzo, con el bocachico en la mano">
+    </div>
+    <p id="msg" role="status"></p>
+    <div class="pasajeros" id="patients"></div>
   </section>
 
-  <section class="wide">
-    <h2>🧑‍🤝‍🧑 Pacientes</h2>
-    <label for="loc">¿Dónde le dio el sueño?</label>
-    <input id="loc" value="la fila del almuerzo, con el bocachico en la mano">
-    <p id="msg"></p>
-    <table>
-      <thead><tr><th>ID</th><th>Nombre</th><th>Nivel</th><th>Estado</th><th>Ubicación</th><th>Doctor</th><th></th></tr></thead>
-      <tbody id="patients"></tbody>
-    </table>
+  <section class="tabla" aria-labelledby="t-staff">
+    <h2 id="t-staff">Personal <small>atienden por turnos</small></h2>
+    <ul class="lista" id="staff"></ul>
   </section>
 
-  <section class="wide">
-    <h2>📋 Últimos episodios (<span id="total">0</span> en total)</h2>
-    <ul id="episodes"></ul>
+  <section class="tabla" aria-labelledby="t-severos">
+    <h2 id="t-severos">Narcolepsia severa <small>episodios de hoy</small></h2>
+    <ul class="lista" id="severe"></ul>
+  </section>
+
+  <section class="tabla ancho" aria-labelledby="t-bitacora">
+    <h2 id="t-bitacora">Bitácora de episodios <small id="total"></small></h2>
+    <ul class="bitacora" id="episodes"></ul>
   </section>
 </main>
+<div class="franjas"></div>
+<footer>Se actualiza solo cada segundo y medio.</footer>
 
 <script>
 // esc evita que un texto se interprete como HTML.
@@ -133,14 +358,14 @@ async function post(url, body) {
     });
     const data = await res.json();
     if (!data.ok) {
-      showMsg('❌ ' + data.message, 'warn');
+      showMsg(data.message, 'warn');
     } else if (data.warning) {
-      showMsg('⚠️ ¡Ay hombe! ' + data.warning, 'warn');
+      showMsg('¡Ay hombe! ' + data.warning, 'warn');
     } else {
-      showMsg('✅ ' + data.message + (data.episodes ? ' — ' + data.episodes.join(' / ') : ''), 'ok');
+      showMsg(data.message + (data.episodes ? ' · ' + data.episodes.join(' · ') : ''), 'ok');
     }
   } catch (e) {
-    showMsg('❌ No hay conexión con el hospital', 'warn');
+    showMsg('No hay conexión con el hospital. Revisa que el servidor siga corriendo.', 'warn');
   }
   refresh();
 }
@@ -154,36 +379,49 @@ function wake(id) {
 }
 
 function render(s) {
-  document.getElementById('rooms').innerHTML = s.Rooms.map(r =>
-    `<div class="room ${esc(r.State)}"><b>${r.Number}</b>${esc(r.State)}<br><small>${esc(r.Occupants.join(', ') || 'vacía')}</small></div>`
-  ).join('');
+  document.getElementById('rooms').innerHTML = s.Rooms.map(r => `
+    <div class="ventana ${esc(r.State)}">
+      ${r.State === 'ocupada' ? '<span class="zzz" aria-hidden="true">z</span>' : ''}
+      <span class="num">${r.Number}</span>
+      <span class="estado">${esc(r.State)}</span>
+      <span class="quien">${esc(r.Occupants.join(', ') || 'cama tendida')}</span>
+    </div>`).join('');
 
   const byId = {};
   s.Patients.forEach(p => byId[p.ID] = p);
   const hallway = s.Hallway || [];
+  const count = document.getElementById('hallway-count');
+  count.textContent = hallway.length;
+  count.className = 'cuenta' + (hallway.length ? '' : ' cero');
   document.getElementById('hallway').innerHTML = hallway.length
-    ? hallway.map(id => `<li><b>${esc(byId[id].Name)}</b> en ${esc(byId[id].Location)}</li>`).join('')
-    : '<li>Pasillo despejado 🎉</li>';
-
-  document.getElementById('severe').innerHTML = (s.Severe || []).map(x =>
-    `<li>${esc(x.PatientID)} ${esc(x.Name)}: <b>${x.Episodes}</b> episodios</li>`).join('');
-
-  document.getElementById('staff').innerHTML = (s.Staff || []).map(x =>
-    `<li>${esc(x.Role)} <b>${esc(x.Name)}</b> (${esc(x.ID)}): ${x.Episodes} episodios</li>`).join('');
+    ? hallway.map(id => `<li><b>${esc(byId[id].Name)}</b><br>${esc(byId[id].Location)}</li>`).join('')
+    : '<li>Pasillo despejado, se puede pasar.</li>';
 
   document.getElementById('patients').innerHTML = s.Patients.map(p => `
-    <tr>
-      <td>${esc(p.ID)}</td><td>${esc(p.Name)}</td><td>${esc(p.Level)}</td>
-      <td><span class="badge s${p.State}">${esc(p.StateLabel)}</span></td>
-      <td>${esc(p.Location)}</td><td>${esc(p.Doctor || '—')}</td>
-      <td>${p.State === 0
-        ? `<button class="sleep" onclick="attack('${esc(p.ID)}')">😴 Se durmió</button>`
-        : `<button class="wake" onclick="wake('${esc(p.ID)}')">⏰ Despertar</button>`}</td>
-    </tr>`).join('');
+    <article class="boleto e${p.State}">
+      <div class="franja"><span>${esc(p.ID)}</span><span>${esc(p.StateLabel)}</span></div>
+      <div class="cuerpo">
+        <div class="nombre">${esc(p.Name)}</div>
+        <div class="dato">Narcolepsia ${esc(p.Level)} · ${p.Age} años</div>
+        <div class="dato">📍 ${esc(p.Location)}</div>
+        <div class="dato">🩺 ${esc(p.Doctor || 'sin doctor asignado')}</div>
+      </div>
+      ${p.State === 0
+        ? `<button class="dormir" onclick="attack('${esc(p.ID)}')">Se durmió aquí</button>`
+        : `<button class="despertar" onclick="wake('${esc(p.ID)}')">Despertar</button>`}
+    </article>`).join('');
 
-  document.getElementById('total').textContent = s.TotalEpisodes;
+  document.getElementById('staff').innerHTML = (s.Staff || []).map(x => `
+    <li><span><span class="rol">${esc(x.Role)}</span><br><b>${esc(x.Name)}</b></span>
+    <span class="cifra">${x.Episodes}</span></li>`).join('');
+
+  document.getElementById('severe').innerHTML = (s.Severe || []).map(x => `
+    <li><span><span class="rol">${esc(x.PatientID)}</span><br><b>${esc(x.Name)}</b></span>
+    <span class="cifra">${x.Episodes}</span></li>`).join('');
+
+  document.getElementById('total').textContent = s.TotalEpisodes + ' en total';
   document.getElementById('episodes').innerHTML = (s.RecentEpisodes || []).map(e =>
-    `<li>${esc(e.Summary)}</li>`).join('') || '<li>Todavía nadie se ha dormido.</li>';
+    `<li>${esc(e.Summary)}</li>`).join('') || '<li>Nadie se ha dormido todavía. Usa «Se durmió aquí» en un paciente.</li>';
 }
 
 async function refresh() {
@@ -191,7 +429,7 @@ async function refresh() {
     const res = await fetch('/api/state');
     render(await res.json());
   } catch (e) {
-    showMsg('❌ No hay conexión con el hospital', 'warn');
+    showMsg('No hay conexión con el hospital. Revisa que el servidor siga corriendo.', 'warn');
   }
 }
 
