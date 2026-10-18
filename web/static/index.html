@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hospital de los Costeños con Narcolepsia</title>
+<style>
+  :root {
+    --mar: #0b7a8f;
+    --arena: #fff4dc;
+    --sol: #f7b32b;
+    --coral: #f25f5c;
+    --palma: #2a9d5c;
+    --tinta: #23313a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--arena);
+    color: var(--tinta);
+  }
+  header {
+    background: linear-gradient(90deg, var(--mar), #13a3b8);
+    color: white;
+    padding: 1rem 1.5rem;
+  }
+  header h1 { margin: 0; font-size: 1.5rem; }
+  header p { margin: .25rem 0 0; opacity: .9; }
+  main {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+  }
+  section {
+    background: white;
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  }
+  h2 { margin-top: 0; font-size: 1.1rem; color: var(--mar); }
+  .rooms { display: flex; flex-wrap: wrap; gap: .75rem; }
+  .room {
+    flex: 1 1 90px;
+    border-radius: 8px;
+    padding: .75rem;
+    text-align: center;
+    color: white;
+  }
+  .room.disponible { background: var(--palma); }
+  .room.ocupada { background: var(--coral); }
+  .room b { font-size: 1.3rem; display: block; }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th, td { text-align: left; padding: .4rem; border-bottom: 1px solid #eee; }
+  .badge { padding: .15rem .5rem; border-radius: 999px; font-size: .8rem; color: white; white-space: nowrap; }
+  .s0 { background: var(--palma); }
+  .s1 { background: var(--coral); }
+  .s2 { background: var(--mar); }
+  button {
+    border: 0; border-radius: 6px; padding: .3rem .6rem;
+    cursor: pointer; font-size: .8rem; margin: .1rem;
+  }
+  .sleep { background: var(--sol); }
+  .wake { background: #d7eef2; }
+  input { padding: .4rem; width: 100%; border: 1px solid #ccc; border-radius: 6px; }
+  ul { padding-left: 1.2rem; margin: 0; }
+  li { margin-bottom: .3rem; font-size: .85rem; }
+  #msg { min-height: 1.4rem; margin: .5rem 0 0; font-weight: 600; }
+  .warn { color: var(--coral); }
+  .ok { color: var(--palma); }
+  .wide { grid-column: 1 / -1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🌴 Hospital de los Costeños con Narcolepsia</h1>
+  <p>Aquí nadie se queda dormido en el pasillo... bueno, casi nadie. ¡Ajá!</p>
+</header>
+<main>
+  <section>
+    <h2>🛏️ Salas</h2>
+    <div class="rooms" id="rooms"></div>
+  </section>
+
+  <section>
+    <h2>🚨 Dormidos en el pasillo</h2>
+    <ul id="hallway"></ul>
+    <h2 style="margin-top:1rem">😴 Reporte de severos (hoy)</h2>
+    <ul id="severe"></ul>
+  </section>
+
+  <section>
+    <h2>👩‍⚕️ Personal (turnos round-robin)</h2>
+    <ul id="staff"></ul>
+  </section>
+
+  <section class="wide">
+    <h2>🧑‍🤝‍🧑 Pacientes</h2>
+    <label for="loc">¿Dónde le dio el sueño?</label>
+    <input id="loc" value="la fila del almuerzo, con el bocachico en la mano">
+    <p id="msg"></p>
+    <table>
+      <thead><tr><th>ID</th><th>Nombre</th><th>Nivel</th><th>Estado</th><th>Ubicación</th><th>Doctor</th><th></th></tr></thead>
+      <tbody id="patients"></tbody>
+    </table>
+  </section>
+
+  <section class="wide">
+    <h2>📋 Últimos episodios (<span id="total">0</span> en total)</h2>
+    <ul id="episodes"></ul>
+  </section>
+</main>
+
+<script>
+// esc evita que un texto se interprete como HTML.
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function showMsg(text, cls) {
+  const el = document.getElementById('msg');
+  el.textContent = text;
+  el.className = cls;
+}
+
+async function post(url, body) {
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(body)
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      showMsg('❌ ' + data.message, 'warn');
+    } else if (data.warning) {
+      showMsg('⚠️ ¡Ay hombe! ' + data.warning, 'warn');
+    } else {
+      showMsg('✅ ' + data.message + (data.episodes ? ' — ' + data.episodes.join(' / ') : ''), 'ok');
+    }
+  } catch (e) {
+    showMsg('❌ No hay conexión con el hospital', 'warn');
+  }
+  refresh();
+}
+
+function attack(id) {
+  post('/api/attack', {patientId: id, location: document.getElementById('loc').value});
+}
+
+function wake(id) {
+  post('/api/wake', {patientId: id});
+}
+
+function render(s) {
+  document.getElementById('rooms').innerHTML = s.Rooms.map(r =>
+    `<div class="room ${esc(r.State)}"><b>${r.Number}</b>${esc(r.State)}<br><small>${esc(r.Occupants.join(', ') || 'vacía')}</small></div>`
+  ).join('');
+
+  const byId = {};
+  s.Patients.forEach(p => byId[p.ID] = p);
+  const hallway = s.Hallway || [];
+  document.getElementById('hallway').innerHTML = hallway.length
+    ? hallway.map(id => `<li><b>${esc(byId[id].Name)}</b> en ${esc(byId[id].Location)}</li>`).join('')
+    : '<li>Pasillo despejado 🎉</li>';
+
+  document.getElementById('severe').innerHTML = (s.Severe || []).map(x =>
+    `<li>${esc(x.PatientID)} ${esc(x.Name)}: <b>${x.Episodes}</b> episodios</li>`).join('');
+
+  document.getElementById('staff').innerHTML = (s.Staff || []).map(x =>
+    `<li>${esc(x.Role)} <b>${esc(x.Name)}</b> (${esc(x.ID)}): ${x.Episodes} episodios</li>`).join('');
+
+  document.getElementById('patients').innerHTML = s.Patients.map(p => `
+    <tr>
+      <td>${esc(p.ID)}</td><td>${esc(p.Name)}</td><td>${esc(p.Level)}</td>
+      <td><span class="badge s${p.State}">${esc(p.StateLabel)}</span></td>
+      <td>${esc(p.Location)}</td><td>${esc(p.Doctor || '—')}</td>
+      <td>${p.State === 0
+        ? `<button class="sleep" onclick="attack('${esc(p.ID)}')">😴 Se durmió</button>`
+        : `<button class="wake" onclick="wake('${esc(p.ID)}')">⏰ Despertar</button>`}</td>
+    </tr>`).join('');
+
+  document.getElementById('total').textContent = s.TotalEpisodes;
+  document.getElementById('episodes').innerHTML = (s.RecentEpisodes || []).map(e =>
+    `<li>${esc(e.Summary)}</li>`).join('') || '<li>Todavía nadie se ha dormido.</li>';
+}
+
+async function refresh() {
+  try {
+    const res = await fetch('/api/state');
+    render(await res.json());
+  } catch (e) {
+    showMsg('❌ No hay conexión con el hospital', 'warn');
+  }
+}
+
+refresh();
+setInterval(refresh, 1500);
+</script>
+</body>
+</html>
