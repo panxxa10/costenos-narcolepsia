@@ -49,7 +49,7 @@ costenos-narcolepsia/
     hospital_test.go   tests (incluye el concurrente)
   simulation/          bonus: una goroutine por paciente
   web/                 bonus: API REST + frontend embebido
-  README.md, AI_USAGE.md, DEFENSA.md
+  README.md
 ```
 
 ## API web
