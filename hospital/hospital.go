@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 )
 
 // Errores centinela del paquete. Se comparan con errors.Is porque casi
@@ -327,4 +328,180 @@ func (h *Hospital) History() []EpisodeRecord {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 	return append([]EpisodeRecord(nil), h.history...)
+}
+
+// PatientsInHallway devuelve los pacientes que están dormidos en el
+// pasillo (sin cama), en orden de admisión.
+func (h *Hospital) PatientsInHallway() []*Patient {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.patientsInHallwayLocked()
+}
+
+func (h *Hospital) patientsInHallwayLocked() []*Patient {
+	var out []*Patient
+	for _, p := range h.patients {
+		if p.state == AsleepInHallway {
+			out = append(out, p)
+		}
+	}
+	return out
+}
+
+// SevereReport devuelve, para cada paciente con narcolepsia severa,
+// cuántos episodios tuvo hoy. Los severos sin episodios aparecen con 0.
+func (h *Hospital) SevereReport() map[*Patient]int {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	return h.severeReportLocked()
+}
+
+func (h *Hospital) severeReportLocked() map[*Patient]int {
+	report := make(map[*Patient]int)
+	for _, p := range h.patients {
+		if p.level == Severe {
+			report[p] = 0
+		}
+	}
+	now := time.Now()
+	for _, e := range h.history {
+		if _, ok := report[e.patient]; ok && sameDay(e.at, now) {
+			report[e.patient]++
+		}
+	}
+	return report
+}
+
+// sameDay dice si a y b caen en la misma fecha del calendario local.
+func sameDay(a, b time.Time) bool {
+	ya, ma, da := a.Date()
+	yb, mb, db := b.Date()
+	return ya == yb && ma == mb && da == db
+}
+
+// Snapshot es una copia de solo datos del estado del hospital, pensada para
+// otras capas (web, simulación). No tiene punteros a objetos internos, así
+// que se puede leer sin el lock.
+type Snapshot struct {
+	Name           string
+	Patients       []PatientInfo
+	Rooms          []RoomInfo
+	Staff          []StaffInfo
+	Hallway        []string // IDs de pacientes dormidos en el pasillo
+	Severe         []SevereInfo
+	RecentEpisodes []EpisodeInfo // los últimos 10, el más reciente primero
+	TotalEpisodes  int
+}
+
+// PatientInfo es la copia plana de un paciente.
+type PatientInfo struct {
+	ID         string
+	Name       string
+	Age        int
+	Level      string
+	State      PatientState
+	StateLabel string
+	Location   string
+	Room       int // 0 si no tiene sala
+	Doctor     string
+}
+
+// RoomInfo es la copia plana de una sala.
+type RoomInfo struct {
+	Number    int
+	Capacity  int
+	State     string
+	Occupants []string // nombres
+}
+
+// StaffInfo es la copia plana de un miembro del personal.
+type StaffInfo struct {
+	ID       string
+	Name     string
+	Role     string
+	Episodes int
+}
+
+// SevereInfo es una fila del reporte de severidad.
+type SevereInfo struct {
+	PatientID string
+	Name      string
+	Episodes  int
+}
+
+// EpisodeInfo es la copia plana de un episodio.
+type EpisodeInfo struct {
+	ID       string
+	At       time.Time
+	Patient  string
+	Attender string
+	Location string
+	Room     int
+	Summary  string
+}
+
+// Snapshot devuelve una foto consistente del hospital tomada bajo el lock.
+func (h *Hospital) Snapshot() Snapshot {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	s := Snapshot{Name: h.name, TotalEpisodes: len(h.history)}
+	for _, p := range h.patients {
+		info := PatientInfo{
+			ID: p.ID(), Name: p.Name(), Age: p.Age(), Level: p.level.String(),
+			State: p.state, StateLabel: p.state.String(), Location: p.currentLocation,
+		}
+		if p.room != nil {
+			info.Room = p.room.Number()
+		}
+		if p.assignedDoctor != nil {
+			info.Doctor = p.assignedDoctor.Name()
+		}
+		s.Patients = append(s.Patients, info)
+	}
+	for _, r := range h.rooms {
+		info := RoomInfo{Number: r.number, Capacity: r.capacity, State: r.state.String(), Occupants: []string{}}
+		for _, p := range r.occupants {
+			info.Occupants = append(info.Occupants, p.Name())
+		}
+		s.Rooms = append(s.Rooms, info)
+	}
+
+	attended := make(map[string]int)
+	for _, e := range h.history {
+		attended[e.attending.ID()]++
+	}
+	for _, a := range h.staff {
+		s.Staff = append(s.Staff, StaffInfo{ID: a.ID(), Name: a.Name(), Role: roleOf(a), Episodes: attended[a.ID()]})
+	}
+
+	for _, p := range h.patientsInHallwayLocked() {
+		s.Hallway = append(s.Hallway, p.ID())
+	}
+	report := h.severeReportLocked()
+	for _, p := range h.patients { // se recorre el slice para que el orden sea fijo
+		if n, ok := report[p]; ok {
+			s.Severe = append(s.Severe, SevereInfo{PatientID: p.ID(), Name: p.Name(), Episodes: n})
+		}
+	}
+	for i := len(h.history) - 1; i >= 0 && len(s.RecentEpisodes) < 10; i-- {
+		e := h.history[i]
+		s.RecentEpisodes = append(s.RecentEpisodes, EpisodeInfo{
+			ID: e.id, At: e.at, Patient: e.patient.Name(), Attender: e.attending.Name(),
+			Location: e.location, Room: e.room, Summary: e.Summary(),
+		})
+	}
+	return s
+}
+
+// roleOf dice qué tipo de Attender es, solo para el Snapshot.
+func roleOf(a Attender) string {
+	switch a.(type) {
+	case *Doctor:
+		return "Doctor"
+	case *Orderly:
+		return "Camillero"
+	default:
+		return "Personal"
+	}
 }
