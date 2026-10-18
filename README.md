@@ -1,6 +1,5 @@
 # Hospital de los Costeños con Narcolepsia 🌴😴
 
-Trabajo de Programación Orientada a Objetos, Universidad EIA.
 Sistema en Go (solo librería estándar) que lleva el control de pacientes costeños con narcolepsia: dónde se durmieron, quién los atendió y a qué sala fueron a parar antes de que bloqueen un pasillo.
 
 ## Integrantes
