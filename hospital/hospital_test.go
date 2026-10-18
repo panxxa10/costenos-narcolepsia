@@ -211,7 +211,7 @@ func TestWakePatientReleasesRoomAndHallwayIsRelocated(t *testing.T) {
 	if err := h.WakePatient("P-1"); err != nil {
 		t.Fatal(err)
 	}
-	if p1.State() != Awake || p1.Room() != nil {
+	if p1.State() != Awake || p1.Room() != nil || p1.Location() != "consulta externa" {
 		t.Errorf("P-1 quedó %s con sala %v", p1.State(), p1.Room())
 	}
 	moved := h.RelocateHallwayPatients()

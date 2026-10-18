@@ -118,6 +118,7 @@ func (p *Patient) SufferSleepAttack(location string) {
 }
 
 // WakeUp despierta al paciente y, si estaba en una sala, la libera.
+// Despierto, vuelve a la consulta externa.
 // Devuelve ErrAlreadyAwake si ya estaba despierto.
 func (p *Patient) WakeUp() error {
 	if p.state == Awake {
@@ -130,6 +131,7 @@ func (p *Patient) WakeUp() error {
 		p.room = nil
 	}
 	p.state = Awake
+	p.currentLocation = "consulta externa"
 	return nil
 }
 
