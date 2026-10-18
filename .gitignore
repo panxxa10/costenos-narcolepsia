@@ -1,0 +1,4 @@
+/costenos-narcolepsia
+*.test
+*.out
+.DS_Store
